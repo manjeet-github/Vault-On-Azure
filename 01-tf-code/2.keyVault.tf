@@ -11,7 +11,7 @@ data "azurerm_client_config" "current" {}
 resource "azurerm_key_vault" "example" {
   name                = "${var.prefix}-keyvault"
   location            = var.location
-  resource_group_name = "${var.name}"
+  resource_group_name = var.name
   tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
 
   enabled_for_deployment          = true
@@ -40,14 +40,14 @@ resource "azurerm_key_vault" "example" {
       "list",
     ]
   }
-  tags = "${var.tags}"
+  tags = var.tags
 }
 
 // Create a new certificate in the above key vault
 resource "azurerm_key_vault_certificate" "example" {
   name         = "${local.virtual_machine_name}-cert"
   key_vault_id = "${azurerm_key_vault.example.id}"
-  tags         = "${var.tags}"
+  tags         = var.tags
 
   certificate_policy {
     issuer_parameters {
@@ -98,17 +98,17 @@ resource "azurerm_key_vault_certificate" "example" {
 // Create secrets (UserName) for windows vm in the above key vault
 resource "azurerm_key_vault_secret" "win-vm-username" {
   name         = "windows-admin-username"
-  value        = "${var.storeWindows_UserName}"
+  value        = var.storeWindows_UserName
   key_vault_id = "${azurerm_key_vault.example.id}"
 
-  tags = "${var.tags}"
+  tags = var.tags
 }
 
 // Create secrets (Password) for windows vm in the above key vault
 resource "azurerm_key_vault_secret" "win-vm-password" {
   name         = "windows-admin-password"
-  value        = "${var.storeWindows_Password}"
+  value        = var.storeWindows_Password
   key_vault_id = "${azurerm_key_vault.example.id}"
 
-  tags = "${var.tags}"
+  tags = var.tags
 }
