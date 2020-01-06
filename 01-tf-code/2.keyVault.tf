@@ -12,7 +12,7 @@ resource "azurerm_key_vault" "example" {
   name                = "${var.prefix}-keyvault"
   location            = var.location
   resource_group_name = var.name
-  tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
+  tenant_id           = data.azurerm_client_config.current.tenant_id
 
   enabled_for_deployment          = true
   enabled_for_template_deployment = true
@@ -20,8 +20,8 @@ resource "azurerm_key_vault" "example" {
   sku_name = "standard"
 
   access_policy {
-    tenant_id = "${data.azurerm_client_config.current.tenant_id}"
-    object_id = "${data.azurerm_client_config.current.service_principal_object_id}"
+    tenant_id = data.azurerm_client_config.current.tenant_id
+    object_id = data.azurerm_client_config.current.service_principal_object_id
 
     certificate_permissions = [
       "create",
