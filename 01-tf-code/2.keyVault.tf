@@ -46,7 +46,7 @@ resource "azurerm_key_vault" "example" {
 // Create a new certificate in the above key vault
 resource "azurerm_key_vault_certificate" "example" {
   name         = "${local.virtual_machine_name}-cert"
-  key_vault_id = "${azurerm_key_vault.example.id}"
+  key_vault_id = azurerm_key_vault.example.id
   tags         = var.tags
 
   certificate_policy {
@@ -99,7 +99,7 @@ resource "azurerm_key_vault_certificate" "example" {
 resource "azurerm_key_vault_secret" "win-vm-username" {
   name         = "windows-admin-username"
   value        = var.storeWindows_UserName
-  key_vault_id = "${azurerm_key_vault.example.id}"
+  key_vault_id = azurerm_key_vault.example.id
 
   tags = var.tags
 }
@@ -108,7 +108,7 @@ resource "azurerm_key_vault_secret" "win-vm-username" {
 resource "azurerm_key_vault_secret" "win-vm-password" {
   name         = "windows-admin-password"
   value        = var.storeWindows_Password
-  key_vault_id = "${azurerm_key_vault.example.id}"
+  key_vault_id = azurerm_key_vault.example.id
 
   tags = var.tags
 }
