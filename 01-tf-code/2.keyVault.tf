@@ -10,7 +10,7 @@ data "azurerm_client_config" "current" {}
 // Create a AZ Key Vault
 resource "azurerm_key_vault" "example" {
   name                = "${var.prefix}-keyvault"
-  location            = "${var.location}"
+  location            = var.location
   resource_group_name = "${var.name}"
   tenant_id           = "${data.azurerm_client_config.current.tenant_id}"
 
