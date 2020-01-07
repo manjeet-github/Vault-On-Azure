@@ -33,3 +33,16 @@ variable "storeWindows_UserName" {
 variable "storeWindows_Password" {
   description = "Define the admin Password to be used for provisioning the VM's"
 }
+
+
+// - variable definitions for network resources.
+variable "address_space" {
+  description = "The address space that is used by the virtual network. You can supply more than one address space. Changing this forces a new resource to be created."
+  default     = "10.0.0.0/16"
+}
+
+variable "subnet_prefix" {
+  description = "The address prefix to use for the subnet."
+  default     = "10.0.10.0/24"
+}
+
