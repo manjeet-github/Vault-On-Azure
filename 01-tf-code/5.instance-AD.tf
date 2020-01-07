@@ -178,7 +178,7 @@ resource "azurerm_virtual_machine" "windows-vm" {
       password = var.storeWindows_Password
       port     = 5986
       https    = true
-      timeout  = "2m"
+      timeout  = "4m"
 
       # NOTE: if you're using a real certificate, rather than a self-signed one, you'll want this set to `false`/to remove this.
       insecure = true
