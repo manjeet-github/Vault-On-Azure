@@ -106,3 +106,24 @@ variable "active_directory_domain" {
 variable "active_directory_netbios_name" {
   description = "The netbios name of the Active Directory domain, for example `hashisingh`"
 }
+
+variable "vault_instance_password" {
+  description = "Password for the vault instances"
+  description = "Pass0000rdDonotUse"
+}
+
+variable "vault_instance_username" {
+  description = "Username for the vault instances"
+  default     = "TestAdmin"
+}
+
+variable "vault_instance_reference" {
+  description = "URL for the image"
+  default     = "/subscriptions/14692f20-9428-451b-8298-102ed4e39c2a/resourceGroups/pncvaultpoc2019img/providers/Microsoft.Compute/images/RHEL-7_Vault-2019-12-18-143051"
+}
+
+
+variable "vault_instance_count" {
+  description = "Size of the cluster"
+  default     = "1"
+}

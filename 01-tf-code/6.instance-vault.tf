@@ -7,13 +7,13 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   sku {
     name     = "Standard_F2"
     tier     = "Standard"
-    capacity = 1
+    capacity = var.vault_instance_count
   }
 
   os_profile {
     computer_name_prefix = "testvm"
-    admin_username       = "myadmin"
-    admin_password       = "Hashicorppnc@#$"
+    admin_username       = var.vault_instance_username
+    admin_password       = var.vault_instance_password
   }
 
   os_profile_linux_config {
@@ -49,7 +49,7 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   }
 
   storage_profile_image_reference {
-    id = "/subscriptions/14692f20-9428-451b-8298-102ed4e39c2a/resourceGroups/pncvaultpoc2019img/providers/Microsoft.Compute/images/RHEL-7_Vault-2019-12-18-143051"
+    id = var.vault_instance_reference
   }
   
   storage_profile_os_disk {
