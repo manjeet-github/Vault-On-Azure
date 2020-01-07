@@ -2,15 +2,10 @@
 
 set -ex
 
-apt-get update
-apt-get install -y unzip
-apt-get install -y libltdl7
 
-sudo cp /vagrant/vault /usr/local/bin/vault
+tee /opt/vault/config/vault.hcl <<EOF
+ui = true
 
-mkdir -p /etc/vault/
-
-tee /etc/vault/vault.hcl <<EOF
 seal "pkcs11" {
   lib            = "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
   slot           = "0"
@@ -19,49 +14,65 @@ seal "pkcs11" {
   hmac_key_label = "hsm_demo_hmac_key"
   generate_key   = "true"
 }
-backend "consul" {
-  address = "127.0.0.1:8500"
-  path    = "vault/"
+
+storage "raft" {
+  path = "/opt/vault/data"
+  node_id = "raft_node_1"
 }
+
+entropy "seal" {
+  mode = "augmentation"
+}
+
 listener "tcp" {
-  address     = "127.0.0.1:8200"
+  address     = "0.0.0.0:8200"
+  cluster_address = "0.0.0.0:8201"
   tls_disable = 1
 }
+
 EOF
 
-tee /etc/vault/vault-secondary.hcl <<EOF
-seal "pkcs11" {
-  lib            = "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
-  slot           = "0"
-  pin            = "1234"
-  key_label      = "hsm_demo_key"
-  hmac_key_label = "hsm_demo_hmac_key"
-  generate_key   = "true"
-}
-backend "consul" {
-  address = "127.0.0.1:8500"
-  path    = "vault/"
-}
-listener "tcp" {
-  address     = "127.0.0.1:8210"
-  tls_disable = 1
-}
-EOF
 
 echo "Installing Vault startup script..."
 sudo bash -c "cat >/etc/systemd/system/vault.service" << 'VAULTSVC'
-[Unit]
-Description=vault agent
+
+[[Unit]
+Description="HashiCorp Vault - A tool for managing secrets"
+Documentation=https://www.vaultproject.io/docs/
 Requires=network-online.target
-After=network-online.target consul.service
+After=network-online.target
+ConditionFileNotEmpty=/opt/vault/config/vault.hcl
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
 [Service]
-EnvironmentFile=-/etc/default/vault
-Environment="VAULT_UI=true"
-Restart=on-failure
-ExecStart=/usr/local/bin/vault server -config=/etc/vault/vault.hcl
-ExecReload=/bin/kill -HUP $MAINPID
+User=vault
+Group=vault
+ProtectSystem=full
+ProtectHome=read-only
+PrivateTmp=yes
+PrivateDevices=yes
+SecureBits=keep-caps
+AmbientCapabilities=CAP_IPC_LOCK
+Capabilities=CAP_IPC_LOCK+ep
+CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
+NoNewPrivileges=yes
+ExecStart=/opt/vault/bin/vault server -config=/opt/vault/config/vault.hcl
+ExecReload=/bin/kill --signal HUP $MAINPID
+KillMode=process
 KillSignal=SIGINT
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+StartLimitInterval=60
+StartLimitIntervalSec=60
+StartLimitBurst=3
+LimitNOFILE=65536
+LimitMEMLOCK=infinity
+
 [Install]
 WantedBy=multi-user.target
+
 VAULTSVC
+
 sudo chmod 0644 /etc/systemd/system/vault.service

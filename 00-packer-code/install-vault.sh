@@ -1,10 +1,5 @@
 #!/bin/bash
-# This script can be used to install Vault and its dependencies. This script has been tested with the following
-# operating systems:
-#
-# 1. Ubuntu 16.04
-# 2. Ubuntu 18.04
-# 3. Amazon Linux 2
+
 
 set -e
 

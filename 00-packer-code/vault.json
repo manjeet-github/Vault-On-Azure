@@ -47,13 +47,13 @@
             {
                 "type": "file",
                 "source": "setup-vault.sh",
-                "destination": "/tmp/install-vault.sh"
+                "destination": "/tmp/setup-vault.sh"
             },
            
             {
                 "type": "file",
                 "source": "setup-softhsm.sh",
-                "destination": "/tmp/install-vault.sh"
+                "destination": "/tmp/setup-softhsm.sh"
             },
             
             {
@@ -63,7 +63,7 @@
                 "yum -y install epel-release",
                 "yum -y install open-vm-tools",
                 "yum -y install git",
-                "yum install softhsm",
+                "yum -y install softhsm",
                 "yum -y update"
                 ]
             },
