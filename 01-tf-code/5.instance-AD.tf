@@ -1,8 +1,9 @@
+# tf code to provision a Windows 2016 servers, install and configure Active Directory
 # - define some local variables
 locals {
-  virtual_machine_name_AD = "${var.vm_name}-AD"
-  virtual_machine_fqdn = "${local.virtual_machine_name_AD}.${var.active_directory_domain}"
-  custom_data_params   = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name_AD}\")"
+  virtual_machine_name_ad = "${var.vm_name}-AD"
+  virtual_machine_fqdn = "${local.virtual_machine_name_ad}.${var.active_directory_domain}"
+  custom_data_params   = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name_ad}\")"
   custom_data_content  = "${local.custom_data_params} ${file("./files/winrm.ps1")}"
 
   // The below locals to build the command to install all the windows packages for AD
@@ -18,8 +19,8 @@ locals {
 }
 
 # - create a public ip to be attached to the VM NIC
-resource "azurerm_public_ip" "windows-public-ip" {
-  name                = "${var.prefix}-public-ip"
+resource "azurerm_public_ip" "windows-ad-public-ip" {
+  name                = "${var.prefix}-ad-public-ip"
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
   allocation_method   = "Dynamic"
@@ -31,11 +32,12 @@ resource "azurerm_public_ip" "windows-public-ip" {
 # - Create a network interface, assign it to a security group, static private IP
 # - attach the public IP from the last resource block
 # - Active Directory server needs a static IP .. So the nw interface is hardcoded with static IP
-resource "azurerm_network_interface" "windows-vm-nic" {
-  name                = "${var.prefix}-windows-vm-nic"
+resource "azurerm_network_interface" "windows-ad-vm-nic" {
+  name                = "${var.prefix}-windows-ad-vm-nic"
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
+  tags = var.tags
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
@@ -44,13 +46,11 @@ resource "azurerm_network_interface" "windows-vm-nic" {
     private_ip_address            = "10.0.12.4"
     public_ip_address_id          = azurerm_public_ip.windows-public-ip.id
   }
-
-  tags = var.tags
 }
 
 # - Create a certificate in KeyVault, Attach it to the Windows Server
-resource "azurerm_key_vault_certificate" "vm_certificate" {
-  name         = "${local.virtual_machine_name_AD}-cert"
+resource "azurerm_key_vault_certificate" "ad_vm_certificate" {
+  name         = "${local.virtual_machine_name_ad}-cert"
   key_vault_id = azurerm_key_vault.example.id
 
   certificate_policy {
@@ -93,7 +93,7 @@ resource "azurerm_key_vault_certificate" "vm_certificate" {
         "keyEncipherment",
       ]
 
-      subject            = "CN=${local.virtual_machine_name_AD}"
+      subject            = "CN=${local.virtual_machine_name_ad}"
       validity_in_months = 12
     }
   }
@@ -102,11 +102,11 @@ resource "azurerm_key_vault_certificate" "vm_certificate" {
 
 # - Create a new virtual machine with the following configuration
 # - Install and run the powershell script
-resource "azurerm_virtual_machine" "windows-vm" {
-  name                  = local.virtual_machine_name_AD
+resource "azurerm_virtual_machine" "windows-ad-vm" {
+  name                  = local.virtual_machine_name_ad
   resource_group_name   = azurerm_resource_group.example.name
   location              = var.location
-  network_interface_ids = ["${azurerm_network_interface.windows-vm-nic.id}"]
+  network_interface_ids = ["${azurerm_network_interface.windows-ad-vm-nic.id}"]
   vm_size               = var.vmsize["medium"]
   tags                  = var.tags
 
@@ -129,7 +129,7 @@ resource "azurerm_virtual_machine" "windows-vm" {
   }
 
   os_profile {
-    computer_name  = local.virtual_machine_name_AD
+    computer_name  = local.virtual_machine_name_ad
     admin_username = var.storeWindows_UserName
     admin_password = var.storeWindows_Password
     custom_data    = local.custom_data_content
@@ -150,7 +150,7 @@ resource "azurerm_virtual_machine" "windows-vm" {
 
     winrm {
       protocol        = "https"
-      certificate_url = azurerm_key_vault_certificate.vm_certificate.secret_id
+      certificate_url = azurerm_key_vault_certificate.ad_vm_certificate.secret_id
     }
 
     additional_unattend_config {
@@ -194,13 +194,12 @@ resource "azurerm_virtual_machine" "windows-vm" {
 
 }
 
-// NOTE: we **highly recommend** not using this configuration for your Production Environment
 // this provisions a single node configuration with no redundancy.
 resource "azurerm_virtual_machine_extension" "create-active-directory-forest" {
   name                 = "create-active-directory-forest"
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
-  virtual_machine_name = azurerm_virtual_machine.windows-vm.name
+  virtual_machine_name = azurerm_virtual_machine.windows-ad-vm.name
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
   type_handler_version = "1.9"

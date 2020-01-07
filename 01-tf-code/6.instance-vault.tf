@@ -1,5 +1,7 @@
-#set up VMs based on a packer image with built in vault
+# tf code to provision a Windows 2016 servers, install and configure Active Directory
+# set up VMs based on a packer image with built in vault
 # we are using scaled set as vault clusters typically have more than one identical servers.
+
 resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   name = "${var.prefix}-vault-cluster"
   location = var.location
@@ -47,8 +49,6 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
     }
 
     network_security_group_id = azurerm_network_security_group.vault-vm-sg.id
-
-   
   }
 
   storage_profile_image_reference {

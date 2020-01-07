@@ -9,17 +9,17 @@ resource "azurerm_resource_group" "example" {
 }
 
 
-## Outputs
-output "computer_name_Windows" {
-  value = azurerm_virtual_machine.windows-vm.name
+## Outputs from Windows Active Directory Server
+output "Windows-Active-Directory-Hostname" {
+  value = azurerm_virtual_machine.windows-ad-vm.name
 }
 
-output "private-ip" {
-  value       = azurerm_network_interface.windows-vm-nic.private_ip_address
+output "Windows-Active-Directory-private-ip" {
+  value       = azurerm_network_interface.windows-ad-vm-nic.private_ip_address
   description = "Private IP Address"
 }
 
-output "public-ip" {
-  value       = azurerm_public_ip.windows-public-ip.ip_address
+output "Windows-Active-Directory-public-ip" {
+  value       = azurerm_public_ip.windows-ad-public-ip.ip_address
   description = "Public IP Address"
 }
