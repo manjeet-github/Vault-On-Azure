@@ -7,7 +7,7 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   sku {
     name     = "Standard_F2"
     tier     = "Standard"
-    capacity = 3
+    capacity = 1
   }
 
   os_profile {
