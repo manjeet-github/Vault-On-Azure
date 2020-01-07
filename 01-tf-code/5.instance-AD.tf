@@ -41,7 +41,7 @@ resource "azurerm_network_interface" "windows-vm-nic" {
 # - Create a certificate in KeyVault, Attach it to the Windows Server
 resource "azurerm_key_vault_certificate" "vm_certificate" {
   name         = "${local.virtual_machine_name_AD}-cert"
-  key_vault_id = data.azurerm_key_vault.keyvault.id
+  key_vault_id = azurerm_key_vault.example.id
 
   certificate_policy {
     issuer_parameters {
