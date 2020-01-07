@@ -33,15 +33,15 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
     name                          = "nic-ipconfig-${count.index}"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = "${element(azurerm_public_ip.windows-public-ip.*.id, count.index)}"
+    public_ip_address_id          = element(azurerm_public_ip.windows-public-ip.*.id, count.index)
   }
 
-  tags = "${merge(
+  tags = merge(
     map(
       "Name", "win-client-vm-public-ip-${count.index}",
       "Description", "This is network card interface object"
     ), var.tags)
-  }"
+  
 }
 
 # -- PROVISION CERTIFICATE IN AZ KEY-VAULT
@@ -103,14 +103,13 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
   resource_group_name       = azurerm_resource_group.example.name
   location                  = var.location
   network_interface_ids = ["${element(azurerm_network_interface.windows-client-vm-nic.*.id, count.index)}"]
-  vm_size               = "${var.vmsize["medium"]}"
+  vm_size               = var.vmsize["medium"]
 
-  tags = "${merge(
+  tags = merge(
     map(
       "Name", "win-client-virtual-machine-${count.index}",
       "Description", "This is windows vm workstation client for developers"
     ), var.tags)
-  }"
 
   delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
