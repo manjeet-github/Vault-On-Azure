@@ -65,6 +65,11 @@ variable "vm_name" {
   default     = "windows-vm"
 }
 
+variable "vm_name_ad" {
+  description = "Name of the virtual machine"
+  default     = "windows-vm"
+}
+
 variable "vmcount" {
   description = "number of virtual machines"
   default     = "1"
