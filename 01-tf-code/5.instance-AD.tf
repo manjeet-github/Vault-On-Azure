@@ -1,8 +1,8 @@
 # - define some local variables
 locals {
-  virtual_machine_name = "${var.vm_name}-AD"
-  virtual_machine_fqdn = "${local.virtual_machine_name}.${var.active_directory_domain}"
-  custom_data_params   = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name}\")"
+  virtual_machine_name_AD = "${var.vm_name}-AD"
+  virtual_machine_fqdn = "${local.virtual_machine_name_AD}.${var.active_directory_domain}"
+  custom_data_params   = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name_AD}\")"
   custom_data_content  = "${local.custom_data_params} ${file("./files/winrm.ps1")}"
 
 }
@@ -40,7 +40,7 @@ resource "azurerm_network_interface" "windows-vm-nic" {
 # - Create a new virtual machine with the following configuration
 # - Install and run the powershell script
 resource "azurerm_virtual_machine" "windows-vm" {
-  name                  = local.virtual_machine_name
+  name                  = local.virtual_machine_name_AD
   resource_group_name   = var.name
   location              = var.location
   network_interface_ids = ["${azurerm_network_interface.windows-vm-nic.id}"]
@@ -66,7 +66,7 @@ resource "azurerm_virtual_machine" "windows-vm" {
   }
 
   os_profile {
-    computer_name  = local.virtual_machine_name
+    computer_name  = local.virtual_machine_name_AD
     admin_username = data.azurerm_key_vault_secret.myWinUser.value
     admin_password = data.azurerm_key_vault_secret.myWinPass.value
     custom_data    = local.custom_data_content
