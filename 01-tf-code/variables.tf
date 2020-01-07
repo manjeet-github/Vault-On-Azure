@@ -127,3 +127,9 @@ variable "vault_instance_count" {
   description = "Size of the cluster"
   default     = "1"
 }
+
+variable "vault_instance_name_prefix" {
+  description = "name prefix for the vault VM"
+  default     = "vaultprefix"
+}
+

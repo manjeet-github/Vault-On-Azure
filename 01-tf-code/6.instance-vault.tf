@@ -11,7 +11,7 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   }
 
   os_profile {
-    computer_name_prefix = "testvm"
+    computer_name_prefix = var.vault_instance_name_prefix
     admin_username       = var.vault_instance_username
     admin_password       = var.vault_instance_password
   }
