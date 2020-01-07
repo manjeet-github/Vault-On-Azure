@@ -14,12 +14,11 @@ resource "azurerm_public_ip" "windows-client-public-ip" {
   allocation_method   = "Dynamic"
   domain_name_label   = "${lower(var.prefix)}-client-${count.index}"
 
-  tags = {merge(
+  tags = merge(
     map(
       "Name", "win-vm-public-ip-${count.index}",
       "Description", "This is public ip object to be attached to the network card"
     ), var.tags)
-  }
 }
 
 resource "azurerm_network_interface" "windows-client-vm-nic" {
