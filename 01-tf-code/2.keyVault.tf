@@ -11,7 +11,7 @@ data "azurerm_client_config" "current" {}
 resource "azurerm_key_vault" "example" {
   name                = "${var.prefix}-keyvault"
   location            = var.location
-  resource_group_name = var.name
+  resource_group_name = azurerm_resources_group.example.name
   tenant_id           = data.azurerm_client_config.current.tenant_id
 
   enabled_for_deployment          = true
