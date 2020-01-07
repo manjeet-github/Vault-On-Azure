@@ -20,10 +20,11 @@ resource "azurerm_public_ip" "windows-public-ip" {
 
 # - Create a network interface, assign it to a security group, static private IP
 # - attach the public IP from the last resource block
+# - Active Directory server needs a static IP .. So the nw interface is hardcoded with static IP
 resource "azurerm_network_interface" "windows-vm-nic" {
-  name                      = "${var.prefix}-windows-vm-nic"
+  name                = "${var.prefix}-windows-vm-nic"
   resource_group_name = azurerm_resource_group.example.name
-  location                  = var.location
+  location            = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
 
   ip_configuration {
@@ -93,7 +94,7 @@ resource "azurerm_key_vault_certificate" "vm_certificate" {
 # - Install and run the powershell script
 resource "azurerm_virtual_machine" "windows-vm" {
   name                  = local.virtual_machine_name_AD
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name   = azurerm_resource_group.example.name
   location              = var.location
   network_interface_ids = ["${azurerm_network_interface.windows-vm-nic.id}"]
   vm_size               = var.vmsize["medium"]
@@ -119,13 +120,13 @@ resource "azurerm_virtual_machine" "windows-vm" {
 
   os_profile {
     computer_name  = local.virtual_machine_name_AD
-    admin_username = data.azurerm_key_vault_secret.myWinUser.value
-    admin_password = data.azurerm_key_vault_secret.myWinPass.value
+    admin_username = var.storeWindows_UserName
+    admin_password = var.storeWindows_Password
     custom_data    = local.custom_data_content
   }
 
   os_profile_secrets {
-    source_vault_id = data.azurerm_key_vault.keyvault.id
+    source_vault_id = azurerm_key_vault.example.id
 
     vault_certificates {
       certificate_url   = azurerm_key_vault_certificate.vm_certificate.secret_id
@@ -163,8 +164,8 @@ resource "azurerm_virtual_machine" "windows-vm" {
     connection {
       type     = "winrm"
       host     = azurerm_public_ip.windows-public-ip.fqdn
-      user     = data.azurerm_key_vault_secret.myWinUser.value
-      password = data.azurerm_key_vault_secret.myWinPass.value
+      user     = var.storeWindows_UserName
+      password = var.storeWindows_Password
       port     = 5986
       https    = true
       timeout  = "2m"

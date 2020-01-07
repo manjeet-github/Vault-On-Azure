@@ -1,10 +1,5 @@
-locals {
-  virtual_machine_name = "${var.prefix}-vm"
-  admin_username       = "${var.storeWindows_UserName}"
-  admin_password       = "${var.storeWindows_Password}"
-  name                 = "${var.prefix}-resources"
-}
 
+// Get the azure provider configuration
 data "azurerm_client_config" "current" {}
 
 // Create a AZ Key Vault
@@ -45,7 +40,7 @@ resource "azurerm_key_vault" "example" {
 
 // Create a new certificate in the above key vault
 resource "azurerm_key_vault_certificate" "example" {
-  name         = "${local.virtual_machine_name}-cert"
+  name         = "dummy-test-cert"
   key_vault_id = azurerm_key_vault.example.id
   tags         = var.tags
 
@@ -89,26 +84,8 @@ resource "azurerm_key_vault_certificate" "example" {
         "keyEncipherment",
       ]
 
-      subject            = "CN=${local.virtual_machine_name}"
+      subject            = "CN=Dummy-test-cert, C=US, ST=Maryland, O=hashicorp, OU=Sales"
       validity_in_months = 12
     }
   }
-}
-
-// Create secrets (UserName) for windows vm in the above key vault
-resource "azurerm_key_vault_secret" "win-vm-username" {
-  name         = "windows-admin-username"
-  value        = var.storeWindows_UserName
-  key_vault_id = azurerm_key_vault.example.id
-
-  tags = var.tags
-}
-
-// Create secrets (Password) for windows vm in the above key vault
-resource "azurerm_key_vault_secret" "win-vm-password" {
-  name         = "windows-admin-password"
-  value        = var.storeWindows_Password
-  key_vault_id = azurerm_key_vault.example.id
-
-  tags = var.tags
 }
