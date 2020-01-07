@@ -8,7 +8,7 @@ locals {
   // The below locals to build the command to install all the windows packages for AD
   // the `exit_code_hack` is to keep the VM Extension resource happy
   import_command       = "Import-Module ADDSDeployment"
-  password_command     = "$password = ConvertTo-SecureString ${data.azurerm_key_vault_secret.myWinPass.value} -AsPlainText -Force"
+  password_command     = "$password = ConvertTo-SecureString var.storeWindows_Password -AsPlainText -Force"
   install_ad_command   = "Add-WindowsFeature -name ad-domain-services -IncludeManagementTools"
   configure_ad_command = "Install-ADDSForest -CreateDnsDelegation:$false -DomainMode Win2012R2 -DomainName ${var.active_directory_domain} -DomainNetbiosName ${var.active_directory_netbios_name} -ForestMode Win2012R2 -InstallDns:$true -SafeModeAdministratorPassword $password -Force:$true"
   shutdown_command     = "shutdown -r -t 10"
