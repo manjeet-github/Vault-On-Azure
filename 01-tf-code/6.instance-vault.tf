@@ -1,3 +1,5 @@
+#set up VMs based on a packer image with built in vault
+# we are using scaled set as vault clusters typically have more than one identical servers.
 resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   name = "${var.prefix}-vault-cluster"
   location = var.location
@@ -5,7 +7,8 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   upgrade_policy_mode = "Manual"
 
   sku {
-    name     = "Standard_F2"
+    #this can be changed if a faster / better performant machine is required.
+    name     = "Standard_F2"  
     tier     = "Standard"
     capacity = var.vault_instance_count
   }
