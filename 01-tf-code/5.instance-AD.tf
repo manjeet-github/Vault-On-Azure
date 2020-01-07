@@ -10,7 +10,7 @@ locals {
 # - create a public ip to be attached to the VM NIC
 resource "azurerm_public_ip" "windows-public-ip" {
   name                = "${var.prefix}-public-ip"
-  resource_group_name = azurerm_resources_group.example.name
+  resource_group_name = azurerm_resource_group.example.name
   location            = var.location
   allocation_method   = "Dynamic"
   domain_name_label   = "${lower(var.prefix)}-active-directory"
@@ -22,7 +22,7 @@ resource "azurerm_public_ip" "windows-public-ip" {
 # - attach the public IP from the last resource block
 resource "azurerm_network_interface" "windows-vm-nic" {
   name                      = "${var.prefix}-windows-vm-nic"
-  resource_group_name = azurerm_resources_group.example.name
+  resource_group_name = azurerm_resource_group.example.name
   location                  = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
 
@@ -93,7 +93,7 @@ resource "azurerm_key_vault_certificate" "vm_certificate" {
 # - Install and run the powershell script
 resource "azurerm_virtual_machine" "windows-vm" {
   name                  = local.virtual_machine_name_AD
-  resource_group_name = azurerm_resources_group.example.name
+  resource_group_name = azurerm_resource_group.example.name
   location              = var.location
   network_interface_ids = ["${azurerm_network_interface.windows-vm-nic.id}"]
   vm_size               = var.vmsize["medium"]
