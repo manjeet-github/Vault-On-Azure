@@ -1,0 +1,90 @@
+{
+    "min_packer_version": "1.4.0",
+
+    "variables": {
+      "subscription_id": "{{env `ARM_SUBSCRIPTION_ID`}}",
+      "tenant_id": "{{env `ARM_TENANT_ID`}}",
+      "client_id": "{{env `ARM_CLIENT_ID`}}",
+      "client_secret": "{{env `ARM_CLIENT_SECRET`}}",
+      "azure_location": "{{env `AZURE_LOCATION`}}",
+      "resource_group_name": "{{env `AZURE_RESOURCE_GROUP`}}",
+      "vault_module_version": "v0.13.3",
+      "vault_version": "1.3.0",
+      "vault_download_url": "https://releases.hashicorp.com/vault/1.3.0+ent.hsm/vault_1.3.0+ent.hsm_linux_amd64.zip"
+    },
+
+    "builders": [
+        {
+        "type": "azure-arm",
+        "subscription_id": "{{user `subscription_id`}}",
+        "tenant_id": "{{user `tenant_id`}}",
+        "client_id": "{{user `client_id`}}",
+        "client_secret": "{{user `client_secret`}}",
+        "managed_image_name": "sehangout-vault-rhel-{{isotime \"2006-01-02-150405\"}}",
+        "managed_image_resource_group_name": "{{user `resource_group_name`}}",
+        "os_type": "Linux",
+
+        "ssh_username": "packer",
+        "ssh_password": "packer",
+
+        "image_publisher": "RedHat",
+        "image_offer": "RHEL",
+        "image_sku": "7-LVM",
+        "ssh_pty": "true",
+        "location": "{{user `azure_location`}}",
+        "vm_size": "Standard_F4s_v2"
+        }
+    ],
+
+    
+    "provisioners": [
+            {
+                "type": "file",
+                "source": "install-vault.sh",
+                "destination": "/tmp/install-vault.sh"
+            },
+           
+            {
+                "type": "file",
+                "source": "setup-vault.sh",
+                "destination": "/tmp/install-vault.sh"
+            },
+           
+            {
+                "type": "file",
+                "source": "setup-softhsm.sh",
+                "destination": "/tmp/install-vault.sh"
+            },
+            
+            {
+                "type": "shell",
+                "execute_command": "echo 'packer'|{{.Vars}} sudo -S -E bash '{{.Path}}'",
+                "inline": [
+                "yum -y install epel-release",
+                "yum -y install open-vm-tools",
+                "yum -y install git",
+                "yum install softhsm",
+                "yum -y update"
+                ]
+            },
+
+            {
+                "type": "shell",
+                "inline": [
+                    "chmod +x /tmp/install-vault.sh",
+                   " /tmp/install-vault.sh --download-url {{user `vault_download_url`}};"
+                  ],
+                "pause_before": "20s"
+            },
+
+            {
+                "execute_command": "echo '{{user `ssh_password`}}' | {{ .Vars }} sudo -S -E sh '{{ .Path }}'",
+                "inline": [
+                "/usr/sbin/waagent -force -deprovision+user && export HISTSIZE=0 && sync"
+                ],
+                "inline_shebang": "/bin/sh -x",
+                "type": "shell",
+                "skip_clean": true
+            }
+    ]
+}
