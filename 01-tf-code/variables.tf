@@ -109,7 +109,7 @@ variable "active_directory_netbios_name" {
 
 variable "vault_instance_password" {
   description = "Password for the vault instances"
-  description = "Pass0000rdDonotUse"
+  default = "Pass0000rdDonotUse"
 }
 
 variable "vault_instance_username" {
