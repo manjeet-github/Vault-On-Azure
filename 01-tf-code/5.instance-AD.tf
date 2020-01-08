@@ -38,7 +38,8 @@ resource "azurerm_network_interface" "windows-ad-vm-nic" {
   location            = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
   tags = var.tags
-
+  dns_servers               = ["10.0.12.4", "8.8.8.8"]
+  
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
     subnet_id                     = azurerm_subnet.subnet.id
