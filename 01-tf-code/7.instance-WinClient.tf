@@ -204,6 +204,7 @@ resource "azurerm_virtual_machine_extension" "join-domain" {
   publisher            = "Microsoft.Compute"
   type                 = "JsonADDomainExtension"
   type_handler_version = "1.3"
+  depends_on  = [azurerm_virtual_machine_extension" "create-active-directory-forest]
 
   # NOTE: the `OUPath` field is intentionally blank, to put it in the Computers OU
   settings = <<SETTINGS
