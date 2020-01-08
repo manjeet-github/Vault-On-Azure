@@ -199,6 +199,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
 
 }
 
+/*
 # -- Code to join the windows clients to the AD Domain
 resource "azurerm_virtual_machine_extension" "join-domain" {
   count                = var.winclient_vmcount
@@ -229,3 +230,4 @@ SETTINGS
 SETTINGS
 
 }
+*/
