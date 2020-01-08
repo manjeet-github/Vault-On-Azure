@@ -70,7 +70,7 @@ variable "vm_name_ad" {
   default     = "windows-vm"
 }
 
-variable "vmcount" {
+variable "winclient_vmcount" {
   description = "number of virtual machines"
   default     = "1"
 }

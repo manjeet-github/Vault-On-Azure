@@ -7,7 +7,7 @@ locals {
 
 # -- PROVISION NETWORK RESOURCES
 resource "azurerm_public_ip" "windows-client-public-ip" {
-  count               = var.vmcount
+  count               = var.winclient_vmcount
   name                = "win-vm-public-ip-${count.index}"
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
@@ -22,7 +22,7 @@ resource "azurerm_public_ip" "windows-client-public-ip" {
 }
 
 resource "azurerm_network_interface" "windows-client-vm-nic" {
-  count                     = var.vmcount
+  count                     = var.winclient_vmcount
   name                      = "win-client-vm-nic-${count.index}"
   resource_group_name       = azurerm_resource_group.example.name
   location                  = var.location
@@ -47,7 +47,7 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
 # -- PROVISION CERTIFICATE IN AZ KEY-VAULT
 # - Create a certificate in KeyVault, Attach it to the Windows Server
 resource "azurerm_key_vault_certificate" "client_vm_certificate" {
-  count        = var.vmcount
+  count        = var.winclient_vmcount
   name         = "${local.virtual_machine_name_winclient}-${count.index}-cert"
   key_vault_id = azurerm_key_vault.example.id
 
@@ -98,7 +98,7 @@ resource "azurerm_key_vault_certificate" "client_vm_certificate" {
 }
 
 resource "azurerm_virtual_machine" "windows-client-vm" {
-  count                 = var.vmcount
+  count                 = var.winclient_vmcount
   name                  = "${local.virtual_machine_name_winclient}-${count.index}"
   resource_group_name       = azurerm_resource_group.example.name
   location                  = var.location
@@ -169,7 +169,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
       content      = file("./files/FirstLogonCommands.xml")
     }
   }
-
+/* -- Disabled remote provisioner --
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
@@ -190,12 +190,13 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
+  */
 
 }
 
 # -- Code to join the windows clients to the AD Domain
 resource "azurerm_virtual_machine_extension" "join-domain" {
-  count                = var.vmcount
+  count                = var.winclient_vmcount
   name                 = element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
