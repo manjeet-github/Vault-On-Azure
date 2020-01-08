@@ -7,6 +7,7 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   location = var.location
   resource_group_name = azurerm_resource_group.example.name
   upgrade_policy_mode = "Manual"
+  depends_on = [ azurerm_virtual_machine.windows-ad-vm ]
 
   sku {
     #this can be changed if a faster / better performant machine is required.

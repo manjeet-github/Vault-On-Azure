@@ -28,6 +28,7 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
   location                  = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
   dns_servers               = ["10.0.12.4"] #- This is needed for the clients to join the AD domain
+  depends_on = [ azurerm_network_interface.windows-ad-vm-nic ]
 
   ip_configuration {
     name                          = "nic-ipconfig-${count.index}"
