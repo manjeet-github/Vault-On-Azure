@@ -1,13 +1,10 @@
-# tf code to provision a Windows 2016 servers, install and configure Active Directory
-# set up VMs based on a packer image with built in vault
+#set up VMs based on a packer image with built in vault
 # we are using scaled set as vault clusters typically have more than one identical servers.
-
 resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
   name = "${var.prefix}-vault-cluster"
   location = var.location
   resource_group_name = azurerm_resource_group.example.name
   upgrade_policy_mode = "Manual"
-  depends_on = [ azurerm_virtual_machine.windows-ad-vm ]
 
   sku {
     #this can be changed if a faster / better performant machine is required.
@@ -49,12 +46,11 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
        }
     }
 
-    dns_settings {
-    dns_servers = var.dns_servers
+    network_security_group_id = azurerm_network_security_group.vault-vm-sg.id
   }
 
-
-    network_security_group_id = azurerm_network_security_group.vault-vm-sg.id
+  dns_settings {
+    dns_servers = var.dns_servers
   }
 
   storage_profile_image_reference {

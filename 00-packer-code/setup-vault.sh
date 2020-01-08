@@ -10,15 +10,15 @@ seal "pkcs11" {
   lib            = "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so"
   slot           = "0"
   pin            = "1234"
-  key_label      = "hsm_demo_key"
-  hmac_key_label = "hsm_demo_hmac_key"
+  key_label    	 = "hsm_demo"
+  hmac_key_label = "hsm_demo_hmac"
   generate_key   = "true"
 }
 
-storage "raft" {
-  path = "/opt/vault/data"
-  node_id = "raft_node_1"
+storage "file" {
+  path = "/opt/vault/filedata"
 }
+
 
 entropy "seal" {
   mode = "augmentation"
@@ -26,9 +26,9 @@ entropy "seal" {
 
 listener "tcp" {
   address     = "0.0.0.0:8200"
-  cluster_address = "0.0.0.0:8201"
   tls_disable = 1
 }
+
 
 EOF
 
