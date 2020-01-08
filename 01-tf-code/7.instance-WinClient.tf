@@ -166,7 +166,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
       pass         = "oobeSystem"
       component    = "Microsoft-Windows-Shell-Setup"
       setting_name = "FirstLogonCommands"
-      content      = "${file("./files/FirstLogonCommands.xml")}"
+      content      = file("./files/FirstLogonCommands.xml")
     }
   }
 

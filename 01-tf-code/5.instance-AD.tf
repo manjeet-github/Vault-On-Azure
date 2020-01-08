@@ -139,7 +139,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
     source_vault_id = azurerm_key_vault.example.id
 
     vault_certificates {
-      certificate_url   = azurerm_key_vault_certificate.vm_certificate.secret_id
+      certificate_url   = azurerm_key_vault_certificate.ad_vm_certificate.secret_id
       certificate_store = "My"
     }
   }
