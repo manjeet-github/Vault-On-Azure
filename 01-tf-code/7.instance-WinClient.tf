@@ -8,7 +8,7 @@ locals {
 # -- PROVISION NETWORK RESOURCES
 resource "azurerm_public_ip" "windows-client-public-ip" {
   count               = var.winclient_vmcount
-  name                = "win-vm-public-ip-${count.index}"
+  name                = "winclient-vm-public-ip-${count.index}"
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
   allocation_method   = "Dynamic"
@@ -16,7 +16,7 @@ resource "azurerm_public_ip" "windows-client-public-ip" {
 
   tags = merge(
     map(
-      "Name", "win-vm-public-ip-${count.index}",
+      "Name", "winclient-vm-public-ip-${count.index}",
       "Description", "This is public ip object to be attached to the network card"
     ), var.tags)
 }
