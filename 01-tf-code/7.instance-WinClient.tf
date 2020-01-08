@@ -33,7 +33,7 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
     name                          = "nic-ipconfig-${count.index}"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "dynamic"
-    public_ip_address_id          = element(azurerm_public_ip.windows-public-ip.*.id, count.index)
+    public_ip_address_id          = element(azurerm_public_ip.windows-client-public-ip.*.id, count.index)
   }
 
   tags = merge(
@@ -133,14 +133,14 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
     computer_name  = "${local.virtual_machine_name_winclient}-${count.index}"
     admin_username = var.storeWindows_UserName
     admin_password = var.storeWindows_Password
-    custom_data    = "${local.custom_data_content_winclient}"
+    custom_data    = local.custom_data_content_winclient
   }
 
   os_profile_secrets {
     source_vault_id = azurerm_key_vault.example.id
 
     vault_certificates {
-      certificate_url   = "${element(azurerm_key_vault_certificate.client_vm_certificate.*.secret_id, count.index)}"
+      certificate_url   = element(azurerm_key_vault_certificate.client_vm_certificate.*.secret_id, count.index)
       certificate_store = "My"
     }
   }
@@ -151,7 +151,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
 
     winrm {
       protocol        = "https"
-      certificate_url = "${element(azurerm_key_vault_certificate.client_vm_certificate.*.secret_id, count.index)}"
+      certificate_url = element(azurerm_key_vault_certificate.client_vm_certificate.*.secret_id, count.index)
     }
 
     additional_unattend_config {
@@ -173,7 +173,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
-      host     = "${element(azurerm_public_ip.windows-client-public-ip.*.fqdn, count.index)}"
+      host     = element(azurerm_public_ip.windows-client-public-ip.*.fqdn, count.index)
       user     = var.storeWindows_UserName
       password = var.storeWindows_Password
       port     = 5986
@@ -196,10 +196,10 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
 # -- Code to join the windows clients to the AD Domain
 resource "azurerm_virtual_machine_extension" "join-domain" {
   count                = var.vmcount
-  name                 = "${element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)}"
+  name                 = element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
-  virtual_machine_name = "${element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)}"
+  virtual_machine_name = element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)
   publisher            = "Microsoft.Compute"
   type                 = "JsonADDomainExtension"
   type_handler_version = "1.3"

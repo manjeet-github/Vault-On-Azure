@@ -44,7 +44,7 @@ resource "azurerm_network_interface" "windows-ad-vm-nic" {
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Static"
     private_ip_address            = "10.0.12.4"
-    public_ip_address_id          = azurerm_public_ip.windows-public-ip.id
+    public_ip_address_id          = azurerm_public_ip.windows-ad-public-ip.id
   }
 }
 
