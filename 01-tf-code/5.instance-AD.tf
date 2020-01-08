@@ -38,13 +38,13 @@ resource "azurerm_network_interface" "windows-ad-vm-nic" {
   location            = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
   tags = var.tags
-  dns_servers               = ["10.0.12.4"]
+  dns_servers               = ["10.0.11.4"]
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "10.0.12.4"
+    private_ip_address            = "10.0.11.4"
     public_ip_address_id          = azurerm_public_ip.windows-ad-public-ip.id
   }
 }

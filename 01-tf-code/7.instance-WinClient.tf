@@ -31,7 +31,7 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
   # - need DNS servers to be configured to join the domain
   # - need the dependency .. so that the AD server is created with static ip and avoid 
   # - the racing condition where the other NIC resources created may grab 10.0.12.4
-  dns_servers               = ["10.0.12.4"] 
+  dns_servers               = ["10.0.11.4"] 
   depends_on = [ azurerm_network_interface.windows-ad-vm-nic ]
 
   ip_configuration {
@@ -199,7 +199,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
 
 }
 
-/*
+
 # -- Code to join the windows clients to the AD Domain
 resource "azurerm_virtual_machine_extension" "join-domain" {
   count                = var.winclient_vmcount
@@ -230,4 +230,3 @@ SETTINGS
 SETTINGS
 
 }
-*/
