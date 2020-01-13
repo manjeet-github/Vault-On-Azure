@@ -170,7 +170,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
     }
   }
 
-/*
+
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
@@ -191,7 +191,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
-*/
+
 
 }
 
