@@ -170,11 +170,11 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
     }
   }
 
-
+/*
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
-      host     = azurerm_public_ip.windows-public-ip.fqdn
+      host     = azurerm_public_ip.windows-ad-public-ip.fqdn
       user     = var.storeWindows_UserName
       password = var.storeWindows_Password
       port     = 5986
@@ -191,7 +191,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
-
+*/
 
 }
 
