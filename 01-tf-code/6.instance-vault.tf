@@ -48,8 +48,6 @@ resource "azurerm_virtual_machine_scale_set" "example-vault-cluster" {
           domain_name_label = "${var.prefix}vaultdemo"
        }
     }
-
-    dns_settings {
     dns_servers = var.dns_servers
   }
 
