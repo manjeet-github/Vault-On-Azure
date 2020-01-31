@@ -1,5 +1,5 @@
 provider "azurerm" {
-version = "=1.36.0"
+  version = "=1.36.0"
 }
 
 // Create the resource groups

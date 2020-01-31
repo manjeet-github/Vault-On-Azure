@@ -3,12 +3,12 @@ resource "azurerm_virtual_network" "vnet" {
   resource_group_name = azurerm_resource_group.example.name
   location            = var.location
   address_space       = ["${var.address_space}"]
-  tags = var.tags
+  tags                = var.tags
 }
 
 resource "azurerm_subnet" "subnet" {
   name                 = "${var.prefix}-subnet-1"
-  resource_group_name = azurerm_resource_group.example.name
+  resource_group_name  = azurerm_resource_group.example.name
   virtual_network_name = azurerm_virtual_network.vnet.name
   address_prefix       = var.subnet_prefix
 }

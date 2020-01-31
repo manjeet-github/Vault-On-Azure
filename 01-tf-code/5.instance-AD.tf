@@ -2,9 +2,9 @@
 # - define some local variables
 locals {
   virtual_machine_name_ad = "${var.vm_name}-AD"
-  virtual_machine_fqdn = "${local.virtual_machine_name_ad}.${var.active_directory_domain}"
-  custom_data_params   = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name_ad}\")"
-  custom_data_content  = "${local.custom_data_params} ${file("./files/winrm.ps1")}"
+  virtual_machine_fqdn    = "${local.virtual_machine_name_ad}.${var.active_directory_domain}"
+  custom_data_params      = "Param($RemoteHostName = \"${local.virtual_machine_fqdn}\", $ComputerName = \"${local.virtual_machine_name_ad}\")"
+  custom_data_content     = "${local.custom_data_params} ${file("./files/winrm.ps1")}"
 
   // The below locals to build the command to install all the windows packages for AD
   // the `exit_code_hack` is to keep the VM Extension resource happy
@@ -33,18 +33,18 @@ resource "azurerm_public_ip" "windows-ad-public-ip" {
 # - attach the public IP from the last resource block
 # - Active Directory server needs a static IP .. So the nw interface is hardcoded with static IP
 resource "azurerm_network_interface" "windows-ad-vm-nic" {
-  name                = "${var.prefix}-windows-ad-vm-nic"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = var.location
+  name                      = "${var.prefix}-windows-ad-vm-nic"
+  resource_group_name       = azurerm_resource_group.example.name
+  location                  = var.location
   network_security_group_id = azurerm_network_security_group.windows-vm-sg.id
-  tags = var.tags
-  dns_servers               = ["10.0.11.4"]
+  tags                      = var.tags
+  dns_servers               = ["10.0.4.4"]
 
   ip_configuration {
     name                          = "${var.prefix}ipconfig"
     subnet_id                     = azurerm_subnet.subnet.id
     private_ip_address_allocation = "Static"
-    private_ip_address            = "10.0.11.4"
+    private_ip_address            = "10.0.4.4"
     public_ip_address_id          = azurerm_public_ip.windows-ad-public-ip.id
   }
 }
@@ -170,7 +170,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
     }
   }
 
-/*
+  
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
@@ -179,7 +179,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
       password = var.storeWindows_Password
       port     = 5986
       https    = true
-      timeout  = "4m"
+      timeout  = "10m"
 
       # NOTE: if you're using a real certificate, rather than a self-signed one, you'll want this set to `false`/to remove this.
       insecure = true
@@ -191,15 +191,16 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
-*/
+
 
 }
 
+/*
 // this provisions a single node configuration with no redundancy.
 resource "azurerm_virtual_machine_extension" "create-active-directory-forest" {
   name                 = "create-active-directory-forest"
-  resource_group_name = azurerm_resource_group.example.name
-  location            = var.location
+  resource_group_name  = azurerm_resource_group.example.name
+  location             = var.location
   virtual_machine_name = azurerm_virtual_machine.windows-ad-vm.name
   publisher            = "Microsoft.Compute"
   type                 = "CustomScriptExtension"
@@ -211,3 +212,4 @@ resource "azurerm_virtual_machine_extension" "create-active-directory-forest" {
     }
 SETTINGS
 }
+*/

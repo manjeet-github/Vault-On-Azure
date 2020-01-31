@@ -18,7 +18,7 @@ resource "azurerm_public_ip" "windows-client-public-ip" {
     map(
       "Name", "winclient-vm-public-ip-${count.index}",
       "Description", "This is public ip object to be attached to the network card"
-    ), var.tags)
+  ), var.tags)
 }
 
 resource "azurerm_network_interface" "windows-client-vm-nic" {
@@ -31,8 +31,8 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
   # - need DNS servers to be configured to join the domain
   # - need the dependency .. so that the AD server is created with static ip and avoid 
   # - the racing condition where the other NIC resources created may grab 10.0.12.4
-  dns_servers               = ["10.0.11.4"] 
-  depends_on = [ azurerm_network_interface.windows-ad-vm-nic ]
+  dns_servers = ["10.0.4.4"]
+  depends_on  = [azurerm_network_interface.windows-ad-vm-nic]
 
   ip_configuration {
     name                          = "nic-ipconfig-${count.index}"
@@ -45,8 +45,8 @@ resource "azurerm_network_interface" "windows-client-vm-nic" {
     map(
       "Name", "win-client-vm-public-ip-${count.index}",
       "Description", "This is network card interface object"
-    ), var.tags)
-  
+  ), var.tags)
+
 }
 
 # -- PROVISION CERTIFICATE IN AZ KEY-VAULT
@@ -105,8 +105,8 @@ resource "azurerm_key_vault_certificate" "client_vm_certificate" {
 resource "azurerm_virtual_machine" "windows-client-vm" {
   count                 = var.winclient_vmcount
   name                  = "${local.virtual_machine_name_winclient}-${count.index}"
-  resource_group_name       = azurerm_resource_group.example.name
-  location                  = var.location
+  resource_group_name   = azurerm_resource_group.example.name
+  location              = var.location
   network_interface_ids = ["${element(azurerm_network_interface.windows-client-vm-nic.*.id, count.index)}"]
   vm_size               = var.vmsize["medium"]
 
@@ -114,7 +114,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
     map(
       "Name", "win-client-virtual-machine-${count.index}",
       "Description", "This is windows vm workstation client for developers"
-    ), var.tags)
+  ), var.tags)
 
   delete_os_disk_on_termination    = true
   delete_data_disks_on_termination = true
@@ -174,7 +174,7 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
       content      = file("./files/FirstLogonCommands.xml")
     }
   }
-/* -- Disabled remote provisioner --
+  /*# -- Disabled remote provisioner --
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
@@ -195,22 +195,22 @@ resource "azurerm_virtual_machine" "windows-client-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
-  */
+*/  
 
 }
 
-
+/*
 # -- Code to join the windows clients to the AD Domain
 resource "azurerm_virtual_machine_extension" "join-domain" {
   count                = var.winclient_vmcount
   name                 = element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)
-  resource_group_name = azurerm_resource_group.example.name
-  location            = var.location
+  resource_group_name  = azurerm_resource_group.example.name
+  location             = var.location
   virtual_machine_name = element(azurerm_virtual_machine.windows-client-vm.*.name, count.index)
   publisher            = "Microsoft.Compute"
   type                 = "JsonADDomainExtension"
   type_handler_version = "1.3"
-  depends_on  = [azurerm_virtual_machine_extension.create-active-directory-forest]
+  depends_on           = [azurerm_virtual_machine_extension.create-active-directory-forest]
 
   # NOTE: the `OUPath` field is intentionally blank, to put it in the Computers OU
   settings = <<SETTINGS
@@ -230,3 +230,4 @@ SETTINGS
 SETTINGS
 
 }
+*/
