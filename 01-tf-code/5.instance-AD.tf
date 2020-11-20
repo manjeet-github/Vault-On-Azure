@@ -170,7 +170,7 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
     }
   }
 
-  
+/*  
   provisioner "remote-exec" {
     connection {
       type     = "winrm"
@@ -191,11 +191,11 @@ resource "azurerm_virtual_machine" "windows-ad-vm" {
       //"powershell.exe -ExecutionPolicy Unrestricted -Command {Install-WindowsFeature -name Web-Server -IncludeManagementTools}",
     ]
   }
-
+*/
 
 }
 
-/*
+
 // this provisions a single node configuration with no redundancy.
 resource "azurerm_virtual_machine_extension" "create-active-directory-forest" {
   name                 = "create-active-directory-forest"
@@ -212,4 +212,3 @@ resource "azurerm_virtual_machine_extension" "create-active-directory-forest" {
     }
 SETTINGS
 }
-*/
